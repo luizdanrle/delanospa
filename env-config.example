@@ -1,0 +1,14 @@
+# Environment Variables for DelirioSpa
+# Copy this file to .env.local and fill in your Supabase credentials
+
+# Supabase Configuration
+# Get these from your Supabase project settings: https://app.supabase.com/project/_/settings/api
+NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key-here
+
+# Instructions:
+# 1. Create a project at https://supabase.com
+# 2. Go to Project Settings > API
+# 3. Copy the URL and anon/public key
+# 4. Paste them above
+# 5. Rename this file to .env.local
