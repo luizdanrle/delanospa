@@ -1,6 +1,11 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+
+// Generate static params for build - actual data is fetched client-side
+export function generateStaticParams() {
+  return [{ id: 'placeholder' }]
+}
 import { useRouter, useParams } from 'next/navigation'
 import { useAuth } from '@/contexts/AuthContext'
 import { supabase, Service } from '@/lib/supabase'
