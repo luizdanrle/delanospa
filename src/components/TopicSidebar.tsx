@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { 
   Home, Info, Scale, Sparkles, Users, MapPin, Phone, 
   Gift, HelpCircle, ChevronRight, ChevronDown, Menu, X,
-  Heart, Clock, Star, Shield
+  Heart, Clock, Star, Shield, Minimize2, Maximize2
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
@@ -118,12 +118,14 @@ const topics: Topic[] = [
 interface TopicSidebarProps {
   activeSection: string
   onNavigate: (id: string) => void
+  onMinimizeChange?: (isMinimized: boolean) => void
 }
 
-export default function TopicSidebar({ activeSection, onNavigate }: TopicSidebarProps) {
+export default function TopicSidebar({ activeSection, onNavigate, onMinimizeChange }: TopicSidebarProps) {
   const [expanded, setExpanded] = useState<string[]>(['massagens', 'locais'])
   const [mobileOpen, setMobileOpen] = useState(false)
   const [isDesktop, setIsDesktop] = useState(false)
+  const [isMinimized, setIsMinimized] = useState(false)
 
   useEffect(() => {
     const checkDesktop = () => {
@@ -134,6 +136,15 @@ export default function TopicSidebar({ activeSection, onNavigate }: TopicSidebar
     return () => window.removeEventListener('resize', checkDesktop)
   }, [])
 
+  // Notificar pai quando minimizado mudar
+  useEffect(() => {
+    onMinimizeChange?.(isMinimized)
+  }, [isMinimized, onMinimizeChange])
+
+  // Encontrar tópico atual para mostrar no botão flutuante
+  const currentTopic = topics.find(t => t.id === activeSection) || topics[0]
+  const CurrentIcon = currentTopic.icon
+
   const toggleExpand = (id: string) => {
     setExpanded(prev => 
       prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]
@@ -143,6 +154,10 @@ export default function TopicSidebar({ activeSection, onNavigate }: TopicSidebar
   const handleClick = (topicId: string) => {
     onNavigate(topicId)
     setMobileOpen(false)
+    // Não minimizar automaticamente ao clicar, apenas em mobile
+    if (!isDesktop) {
+      setMobileOpen(false)
+    }
   }
 
   return (
@@ -155,28 +170,63 @@ export default function TopicSidebar({ activeSection, onNavigate }: TopicSidebar
         {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
       </button>
 
+      {/* Floating Indicator Button - Desktop Only (quando minimizado) */}
+      <AnimatePresence>
+        {isMinimized && isDesktop && (
+          <motion.button
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -20 }}
+            onClick={() => setIsMinimized(false)}
+            className="fixed left-4 top-1/2 -translate-y-1/2 z-50 hidden lg:flex flex-col items-center gap-2 p-3 rounded-2xl bg-slate-900/95 border border-purple-500/30 shadow-2xl backdrop-blur-sm hover:bg-slate-800 transition-colors"
+          >
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-600 to-pink-600 flex items-center justify-center">
+              <CurrentIcon className="w-5 h-5 text-white" />
+            </div>
+            <div className="writing-vertical text-xs text-slate-400 font-medium" style={{ writingMode: 'vertical-rl' }}>
+              {currentTopic.title}
+            </div>
+            <Maximize2 className="w-4 h-4 text-slate-500" />
+          </motion.button>
+        )}
+      </AnimatePresence>
+
       {/* Sidebar */}
       <motion.aside
         initial={false}
-        animate={isDesktop ? { x: 0, opacity: 1 } : {
+        animate={isDesktop ? { 
+          x: isMinimized ? -100 + '%' : 0, 
+          opacity: isMinimized ? 0 : 1 
+        } : {
           x: mobileOpen ? 0 : -100 + '%',
           opacity: mobileOpen ? 1 : 0
         }}
         className={cn(
           'fixed left-0 top-0 h-screen w-80 bg-slate-950 border-r border-slate-800 z-40',
-          'lg:relative lg:translate-x-0 lg:opacity-100 lg:block overflow-hidden'
+          'lg:relative lg:translate-x-0 lg:opacity-100 lg:block overflow-hidden',
+          isMinimized && 'lg:hidden'
         )}
       >
-        {/* Logo */}
+        {/* Logo com botão Minimizar */}
         <div className="p-6 border-b border-slate-800">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-600 to-pink-600 flex items-center justify-center">
-              <Heart className="w-5 h-5 text-white" />
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-600 to-pink-600 flex items-center justify-center">
+                <Heart className="w-5 h-5 text-white" />
+              </div>
+              <div>
+                <h1 className="font-bold text-white text-lg">DelanoSpa</h1>
+                <p className="text-slate-400 text-xs">Menu de Tópicos</p>
+              </div>
             </div>
-            <div>
-              <h1 className="font-bold text-white text-lg">DelanoSpa</h1>
-              <p className="text-slate-400 text-xs">Menu de Tópicos</p>
-            </div>
+            {/* Minimize Button - Desktop Only */}
+            <button
+              onClick={() => setIsMinimized(true)}
+              className="hidden lg:flex p-2 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-white transition-colors"
+              title="Minimizar menu"
+            >
+              <Minimize2 className="w-4 h-4" />
+            </button>
           </div>
         </div>
 

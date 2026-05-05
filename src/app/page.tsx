@@ -474,6 +474,7 @@ export default function Home() {
   const [activeSection, setActiveSection] = useState('inicio')
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
+  const [sidebarMinimized, setSidebarMinimized] = useState(false)
   const [therapists, setTherapists] = useState<Therapist[]>(fallbackTherapists)
   const [locations, setLocations] = useState<Location[]>(fallbackLocations)
   const [services, setServices] = useState<Service[]>(fallbackServices)
@@ -611,7 +612,8 @@ export default function Home() {
           } else if (id === 'inicio') {
             window.scrollTo({ top: 0, behavior: 'smooth' })
           }
-        }} 
+        }}
+        onMinimizeChange={setSidebarMinimized}
       />
       
       {/* PREMIUM VISUAL EFFECTS - Diferenciadores */}
@@ -774,8 +776,11 @@ export default function Home() {
         </motion.div>
       </motion.nav>
 
-      {/* MAIN CONTENT - Com margem para o sidebar */}
-      <main className="lg:ml-80 transition-all duration-300">
+      {/* MAIN CONTENT - Com margem para o sidebar (condicional) */}
+      <main className={cn(
+        'transition-all duration-300',
+        sidebarMinimized ? 'lg:ml-0' : 'lg:ml-80'
+      )}>
       {/* AI HERO SLIDER - Galeria com transições */}
       <section id="inicio" className="px-4 lg:px-8 pt-8">
         <HeroSlider />
