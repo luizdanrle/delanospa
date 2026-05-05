@@ -204,8 +204,7 @@ export default function TopicSidebar({ activeSection, onNavigate, onMinimizeChan
         }}
         className={cn(
           'fixed left-0 top-0 h-screen w-80 bg-slate-950 border-r border-slate-800 z-40',
-          'lg:relative lg:translate-x-0 lg:opacity-100 lg:block overflow-hidden',
-          isMinimized && 'lg:hidden'
+          'lg:relative lg:block overflow-hidden'
         )}
       >
         {/* Logo com botão Minimizar */}
