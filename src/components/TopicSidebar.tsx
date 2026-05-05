@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { 
   Home, Info, Scale, Sparkles, Users, MapPin, Phone, 
@@ -123,6 +123,16 @@ interface TopicSidebarProps {
 export default function TopicSidebar({ activeSection, onNavigate }: TopicSidebarProps) {
   const [expanded, setExpanded] = useState<string[]>(['massagens', 'locais'])
   const [mobileOpen, setMobileOpen] = useState(false)
+  const [isDesktop, setIsDesktop] = useState(false)
+
+  useEffect(() => {
+    const checkDesktop = () => {
+      setIsDesktop(window.innerWidth >= 1024)
+    }
+    checkDesktop()
+    window.addEventListener('resize', checkDesktop)
+    return () => window.removeEventListener('resize', checkDesktop)
+  }, [])
 
   const toggleExpand = (id: string) => {
     setExpanded(prev => 
@@ -148,13 +158,13 @@ export default function TopicSidebar({ activeSection, onNavigate }: TopicSidebar
       {/* Sidebar */}
       <motion.aside
         initial={false}
-        animate={{
+        animate={isDesktop ? { x: 0, opacity: 1 } : {
           x: mobileOpen ? 0 : -100 + '%',
           opacity: mobileOpen ? 1 : 0
         }}
         className={cn(
           'fixed left-0 top-0 h-screen w-80 bg-slate-950 border-r border-slate-800 z-40',
-          'lg:translate-x-0 lg:opacity-100 lg:block overflow-hidden'
+          'lg:relative lg:translate-x-0 lg:opacity-100 lg:block overflow-hidden'
         )}
       >
         {/* Logo */}
