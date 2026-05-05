@@ -15,7 +15,7 @@ export default function LocationsMap() {
 
   return (
     <section id="locais" className="py-24 bg-slate-950 relative overflow-hidden">
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-emerald-900/10 via-slate-950 to-slate-950" />
+      <div className="absolute inset-0 bg-gradient-to-t from-emerald-900/10 via-slate-950 to-slate-950" />
       
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
         {/* Header */}
