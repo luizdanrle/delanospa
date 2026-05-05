@@ -255,10 +255,13 @@ export default function TopicSidebar({ activeSection, onNavigate }: TopicSidebar
                       {topic.subItems.map((subItem) => (
                         <button
                           key={subItem.id}
-                          onClick={() => handleClick(subItem.id)}
+                          onClick={() => {
+                            // Navegar para o tópico principal, não para o subitem
+                            handleClick(topic.id)
+                          }}
                           className={cn(
                             'w-full flex items-center gap-2 p-2 rounded-lg text-sm transition-all text-left',
-                            activeSection === subItem.id
+                            activeSection === topic.id
                               ? 'text-purple-400 bg-purple-500/10'
                               : 'text-slate-400 hover:text-slate-300 hover:bg-slate-900/50'
                           )}

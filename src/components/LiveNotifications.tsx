@@ -8,7 +8,8 @@ import {
   Star, 
   User,
   Sparkles,
-  CheckCircle
+  CheckCircle,
+  X
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
@@ -53,8 +54,11 @@ const getColors = (type: string) => {
 export default function LiveNotifications() {
   const [currentIndex, setCurrentIndex] = useState(0)
   const [isVisible, setIsVisible] = useState(true)
+  const [isClosed, setIsClosed] = useState(false)
 
   useEffect(() => {
+    if (isClosed) return
+    
     const interval = setInterval(() => {
       setIsVisible(false)
       setTimeout(() => {
@@ -64,7 +68,14 @@ export default function LiveNotifications() {
     }, 4000)
 
     return () => clearInterval(interval)
-  }, [])
+  }, [isClosed])
+
+  const handleClose = () => {
+    setIsClosed(true)
+    setIsVisible(false)
+  }
+
+  if (isClosed) return null
 
   const current = notifications[currentIndex]
   const Icon = getIcon(current.type)
@@ -81,32 +92,31 @@ export default function LiveNotifications() {
             exit={{ opacity: 0, x: -50, scale: 0.9 }}
             transition={{ duration: 0.3 }}
             className={cn(
-              'flex items-center gap-3 px-4 py-3 rounded-xl border backdrop-blur-sm max-w-xs',
+              'flex items-center gap-2 px-3 py-2 rounded-lg border backdrop-blur-sm max-w-[240px] text-xs',
               colors
             )}
           >
-            <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center flex-shrink-0">
-              <Icon className="w-5 h-5" />
+            <div className="w-7 h-7 rounded-full bg-white/10 flex items-center justify-center flex-shrink-0">
+              <Icon className="w-3.5 h-3.5" />
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-white truncate">
+              <p className="font-medium text-white truncate leading-tight">
                 {current.message}
               </p>
-              <div className="flex items-center gap-2 text-xs opacity-80">
-                <MapPin className="w-3 h-3" />
+              <div className="flex items-center gap-1.5 text-[10px] opacity-80 mt-0.5">
+                <MapPin className="w-2.5 h-2.5" />
                 <span>{current.location}</span>
                 <span>•</span>
-                <Clock className="w-3 h-3" />
                 <span>{current.time}</span>
               </div>
             </div>
-            {current.rating && (
-              <div className="flex items-center gap-0.5">
-                {[...Array(current.rating)].map((_, i) => (
-                  <Star key={i} className="w-3 h-3 fill-current" />
-                ))}
-              </div>
-            )}
+            <button
+              onClick={handleClose}
+              className="p-1 rounded hover:bg-white/10 transition-colors flex-shrink-0"
+              aria-label="Fechar notificação"
+            >
+              <X className="w-3 h-3" />
+            </button>
           </motion.div>
         )}
       </AnimatePresence>
@@ -117,14 +127,23 @@ export default function LiveNotifications() {
 // Smaller version for mobile
 export function LiveNotificationsMobile() {
   const [current, setCurrent] = useState(notifications[0])
+  const [isClosed, setIsClosed] = useState(false)
 
   useEffect(() => {
+    if (isClosed) return
+    
     const interval = setInterval(() => {
       const random = notifications[Math.floor(Math.random() * notifications.length)]
       setCurrent(random)
     }, 5000)
     return () => clearInterval(interval)
-  }, [])
+  }, [isClosed])
+
+  const handleClose = () => {
+    setIsClosed(true)
+  }
+
+  if (isClosed) return null
 
   const Icon = getIcon(current.type)
 
@@ -134,11 +153,18 @@ export function LiveNotificationsMobile() {
         key={current.id}
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="flex items-center justify-center gap-2 px-4 py-2 rounded-full bg-slate-900/90 border border-slate-800 text-sm"
+        className="flex items-center gap-2 px-3 py-2 rounded-full bg-slate-900/90 border border-slate-800 text-xs"
       >
-        <Icon className="w-4 h-4 text-green-400" />
-        <span className="text-slate-300 truncate">{current.message}</span>
-        <span className="text-slate-500 text-xs">{current.time}</span>
+        <Icon className="w-3.5 h-3.5 text-green-400 flex-shrink-0" />
+        <span className="text-slate-300 truncate flex-1">{current.message}</span>
+        <span className="text-slate-500 text-[10px] flex-shrink-0">{current.time}</span>
+        <button
+          onClick={handleClose}
+          className="p-1 rounded hover:bg-white/10 transition-colors flex-shrink-0 ml-1"
+          aria-label="Fechar"
+        >
+          <X className="w-3 h-3 text-slate-400" />
+        </button>
       </motion.div>
     </div>
   )
