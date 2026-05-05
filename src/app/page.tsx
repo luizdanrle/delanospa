@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 
-// Página temporária - atualização em andamento
+// Página temporária - atualização em andamento v2
 export default function Home() {
   const [date, setDate] = useState<string>('')
   
