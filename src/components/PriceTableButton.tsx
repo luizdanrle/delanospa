@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { X, Euro, Clock, Sparkles, Star, Shield, ArrowRight } from 'lucide-react'
 import { cn } from '@/lib/utils'
@@ -291,6 +291,12 @@ export function PriceTableModal({
 
 export function PriceTableButton() {
   const [showModal, setShowModal] = useState(false)
+
+  useEffect(() => {
+    const handleOpenPriceTable = () => setShowModal(true)
+    window.addEventListener('openPriceTable', handleOpenPriceTable)
+    return () => window.removeEventListener('openPriceTable', handleOpenPriceTable)
+  }, [])
 
   return (
     <>

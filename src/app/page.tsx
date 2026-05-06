@@ -675,28 +675,30 @@ export default function Home() {
                 { name: 'Início', id: 'top' },
                 { name: 'Sobre', id: 'sobre' },
                 { name: 'Regras', id: 'regras' },
+                { name: 'Preços', id: 'precos' },
                 { name: 'Massagens', id: 'massagens' },
                 { name: 'Massagistas', id: 'massagistas' },
                 { name: 'Locais', id: 'locais' },
                 { name: 'Contactos', id: 'contactos' },
               ].map((item) => (
-                <div key={item.name} className="flex items-center gap-2">
-                  <button
-                    onClick={() => {
-                      if (item.id === 'top') {
-                        window.scrollTo({ top: 0, behavior: 'smooth' })
-                      } else {
-                        document.getElementById(item.id)?.scrollIntoView({ behavior: 'smooth' })
-                      }
-                    }}
-                    className="text-sm font-medium text-slate-300 hover:text-white transition-colors relative group"
-                  >
-                    {item.name}
-                    <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-purple-500 group-hover:w-full transition-all duration-300" />
-                  </button>
-                  {/* Price Table Button - Ao lado de Regras */}
-                  {item.name === 'Regras' && <PriceTableButton />}
-                </div>
+                <button
+                  key={item.name}
+                  onClick={() => {
+                    if (item.id === 'top') {
+                      window.scrollTo({ top: 0, behavior: 'smooth' })
+                    } else if (item.id === 'precos') {
+                      // Abrir modal da tabela de preços
+                      const event = new CustomEvent('openPriceTable')
+                      window.dispatchEvent(event)
+                    } else {
+                      document.getElementById(item.id)?.scrollIntoView({ behavior: 'smooth' })
+                    }
+                  }}
+                  className="text-sm font-medium text-slate-300 hover:text-white transition-colors relative group"
+                >
+                  {item.name}
+                  <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-purple-500 group-hover:w-full transition-all duration-300" />
+                </button>
               ))}
             </div>
 
@@ -771,6 +773,7 @@ export default function Home() {
               { name: 'Início', id: 'top' },
               { name: 'Sobre', id: 'sobre' },
               { name: 'Regras', id: 'regras' },
+              { name: 'Preços', id: 'precos' },
               { name: 'Massagens', id: 'massagens' },
               { name: 'Massagistas', id: 'massagistas' },
               { name: 'Locais', id: 'locais' },
@@ -783,6 +786,10 @@ export default function Home() {
                   setTimeout(() => {
                     if (item.id === 'top') {
                       window.scrollTo({ top: 0, behavior: 'smooth' })
+                    } else if (item.id === 'precos') {
+                      // Abrir modal da tabela de preços
+                      const event = new CustomEvent('openPriceTable')
+                      window.dispatchEvent(event)
                     } else {
                       document.getElementById(item.id)?.scrollIntoView({ behavior: 'smooth' })
                     }
@@ -1539,6 +1546,9 @@ export default function Home() {
         isOpen={showCompare} 
         onClose={() => setShowCompare(false)} 
       />
+      
+      {/* PRICE TABLE MODAL - Componente oculto que responde ao evento */}
+      <PriceTableButton />
     </main>
     </div>
     </ToastProvider>
