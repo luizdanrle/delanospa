@@ -5,6 +5,13 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { X, Scale, Check, XCircle, MapPin, Star, Clock, ChevronRight, ChevronLeft } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import Image from 'next/image'
+import { 
+  getSharedCompareItems, 
+  addSharedCompareItem, 
+  removeSharedCompareItem,
+  clearSharedCompare,
+  type SharedCompareItem 
+} from '@/lib/sharedFavorites'
 
 interface CompareItem {
   id: string
@@ -20,47 +27,98 @@ interface CompareItem {
   services: string[]
   languages: string[]
   availability: string
+  created_at?: string
+  user_ip?: string
 }
 
 export function useCompare() {
   const [items, setItems] = useState<CompareItem[]>([])
   const [isLoaded, setIsLoaded] = useState(false)
 
+  // Carregar itens de comparação do banco de dados compartilhado
   useEffect(() => {
-    const saved = localStorage.getItem('delirio-compare')
-    if (saved) {
+    const loadCompareItems = async () => {
       try {
-        setItems(JSON.parse(saved))
-      } catch (e) {
-        console.error('Error loading compare:', e)
+        const sharedItems = await getSharedCompareItems()
+        setItems(sharedItems)
+      } catch (error) {
+        console.error('Error loading shared compare items:', error)
+        // Fallback para localStorage em caso de erro
+        const saved = localStorage.getItem('delirio-compare')
+        if (saved) {
+          try {
+            setItems(JSON.parse(saved))
+          } catch (e) {
+            console.error('Error loading fallback compare items:', e)
+          }
+        }
       }
+      setIsLoaded(true)
     }
-    setIsLoaded(true)
+
+    loadCompareItems()
   }, [])
 
-  useEffect(() => {
-    if (isLoaded) {
-      localStorage.setItem('delirio-compare', JSON.stringify(items))
+  const addToCompare = async (therapist: any) => {
+    if (items.length >= 3) {
+      return false // Limite de 3 itens
     }
-  }, [items, isLoaded])
 
-  const addItem = (item: CompareItem) => {
-    setItems(prev => {
-      if (prev.some(i => i.id === item.id)) return prev
-      if (prev.length >= 3) return prev // Max 3 items
-      return [...prev, item]
-    })
+    if (items.some(item => item.id === therapist.id)) {
+      return false // Já existe
+    }
+
+    const newItem: Omit<SharedCompareItem, 'created_at' | 'user_ip'> = {
+      id: therapist.id,
+      name: therapist.name,
+      image: therapist.image_url,
+      specialty: therapist.specialty || 'Massagista',
+      location: therapist.location || 'Lisboa',
+      rating: therapist.rating || 4.8,
+      reviews: therapist.reviews || 156,
+      price: therapist.price || 150,
+      duration: therapist.duration || 90,
+      experience: therapist.experience_years || 5,
+      services: therapist.services || ['Tântrica', 'Relaxante'],
+      languages: therapist.languages || ['Português', 'Inglês'],
+      availability: therapist.availability || 'Hoje'
+    }
+
+    const success = await addSharedCompareItem(newItem)
+    if (success) {
+      const fullItem: CompareItem = {
+        ...newItem,
+        created_at: new Date().toISOString(),
+        user_ip: 'current'
+      }
+      setItems(prev => [...prev, fullItem])
+      return true
+    }
+    
+    return false
   }
 
-  const removeItem = (id: string) => {
-    setItems(prev => prev.filter(i => i.id !== id))
+  const removeFromCompare = async (id: string) => {
+    const success = await removeSharedCompareItem(id)
+    if (success) {
+      setItems(prev => prev.filter(item => item.id !== id))
+    }
   }
 
-  const clearAll = () => setItems([])
+  const clearCompare = async () => {
+    const success = await clearSharedCompare()
+    if (success) {
+      setItems([])
+    }
+  }
 
-  const isInCompare = (id: string) => items.some(i => i.id === id)
-
-  return { items, addItem, removeItem, clearAll, isInCompare, count: items.length }
+  return {
+    items,
+    addToCompare,
+    removeFromCompare,
+    clearCompare,
+    isLoaded
+  }
 }
 
 export function CompareButton({ 
@@ -70,9 +128,8 @@ export function CompareButton({
   item: CompareItem
   className?: string 
 }) {
-  const { isInCompare, addItem, removeItem, count } = useCompare()
-  const active = isInCompare(item.id)
-  const disabled = !active && count >= 3
+  const { addToCompare, removeFromCompare, isLoaded } = useCompare()
+  const active = isLoaded && item.id
 
   return (
     <motion.button

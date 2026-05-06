@@ -5,6 +5,12 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { Heart, X, User, MapPin, Star, Trash2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import Image from 'next/image'
+import { 
+  getSharedFavorites, 
+  addSharedFavorite, 
+  removeSharedFavorite,
+  type SharedFavorite 
+} from '@/lib/sharedFavorites'
 
 interface Favorite {
   id: string
@@ -13,52 +19,95 @@ interface Favorite {
   specialty: string
   location: string
   rating: number
+  created_at?: string
+  user_ip?: string
 }
 
 export function useFavorites() {
   const [favorites, setFavorites] = useState<Favorite[]>([])
   const [isLoaded, setIsLoaded] = useState(false)
 
+  // Carregar favoritos do banco de dados compartilhado
   useEffect(() => {
-    const saved = localStorage.getItem('delirio-favorites')
-    if (saved) {
+    const loadFavorites = async () => {
       try {
-        setFavorites(JSON.parse(saved))
-      } catch (e) {
-        console.error('Error loading favorites:', e)
+        const sharedFavorites = await getSharedFavorites()
+        setFavorites(sharedFavorites)
+      } catch (error) {
+        console.error('Error loading shared favorites:', error)
+        // Fallback para localStorage em caso de erro
+        const saved = localStorage.getItem('delirio-favorites')
+        if (saved) {
+          try {
+            setFavorites(JSON.parse(saved))
+          } catch (e) {
+            console.error('Error loading fallback favorites:', e)
+          }
+        }
       }
+      setIsLoaded(true)
     }
-    setIsLoaded(true)
+
+    loadFavorites()
   }, [])
 
-  useEffect(() => {
-    if (isLoaded) {
-      localStorage.setItem('delirio-favorites', JSON.stringify(favorites))
-    }
-  }, [favorites, isLoaded])
-
-  const addFavorite = (item: Favorite) => {
-    setFavorites(prev => {
-      if (prev.some(f => f.id === item.id)) return prev
-      return [...prev, item]
-    })
-  }
-
-  const removeFavorite = (id: string) => {
-    setFavorites(prev => prev.filter(f => f.id !== id))
-  }
-
-  const isFavorite = (id: string) => favorites.some(f => f.id === id)
-
-  const toggleFavorite = (item: Favorite) => {
-    if (isFavorite(item.id)) {
-      removeFavorite(item.id)
+  const toggleFavorite = async (therapist: any) => {
+    const exists = favorites.some(f => f.id === therapist.id)
+    
+    if (exists) {
+      // Remover favorito
+      const favoriteToRemove = favorites.find(f => f.id === therapist.id)
+      if (favoriteToRemove) {
+        const success = await removeSharedFavorite(favoriteToRemove.id)
+        if (success) {
+          setFavorites(prev => prev.filter(f => f.id !== therapist.id))
+        }
+      }
     } else {
-      addFavorite(item)
+      // Adicionar favorito
+      const newFavorite: Omit<SharedFavorite, 'created_at' | 'user_ip'> = {
+        id: therapist.id,
+        name: therapist.name,
+        image: therapist.image_url,
+        specialty: therapist.specialty || 'Massagista',
+        location: therapist.location || 'Lisboa',
+        rating: therapist.rating || 4.8
+      }
+      
+      const success = await addSharedFavorite(newFavorite)
+      if (success) {
+        const fullFavorite: Favorite = {
+          ...newFavorite,
+          created_at: new Date().toISOString(),
+          user_ip: 'current'
+        }
+        setFavorites(prev => [...prev, fullFavorite])
+      }
     }
   }
 
-  return { favorites, addFavorite, removeFavorite, isFavorite, toggleFavorite, count: favorites.length }
+  const removeFavorite = async (id: string) => {
+    const success = await removeSharedFavorite(id)
+    if (success) {
+      setFavorites(prev => prev.filter(f => f.id !== id))
+    }
+  }
+
+  const clearFavorites = async () => {
+    // Remover todos os favoritos um por um
+    for (const favorite of favorites) {
+      await removeSharedFavorite(favorite.id)
+    }
+    setFavorites([])
+  }
+
+  return {
+    favorites,
+    toggleFavorite,
+    removeFavorite,
+    clearFavorites,
+    isLoaded
+  }
 }
 
 export function FavoriteButton({ 
