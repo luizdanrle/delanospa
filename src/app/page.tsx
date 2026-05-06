@@ -680,20 +680,23 @@ export default function Home() {
                 { name: 'Locais', id: 'locais' },
                 { name: 'Contactos', id: 'contactos' },
               ].map((item) => (
-                <button
-                  key={item.name}
-                  onClick={() => {
-                    if (item.id === 'top') {
-                      window.scrollTo({ top: 0, behavior: 'smooth' })
-                    } else {
-                      document.getElementById(item.id)?.scrollIntoView({ behavior: 'smooth' })
-                    }
-                  }}
-                  className="text-sm font-medium text-slate-300 hover:text-white transition-colors relative group"
-                >
-                  {item.name}
-                  <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-purple-500 group-hover:w-full transition-all duration-300" />
-                </button>
+                <div key={item.name} className="flex items-center gap-2">
+                  <button
+                    onClick={() => {
+                      if (item.id === 'top') {
+                        window.scrollTo({ top: 0, behavior: 'smooth' })
+                      } else {
+                        document.getElementById(item.id)?.scrollIntoView({ behavior: 'smooth' })
+                      }
+                    }}
+                    className="text-sm font-medium text-slate-300 hover:text-white transition-colors relative group"
+                  >
+                    {item.name}
+                    <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-purple-500 group-hover:w-full transition-all duration-300" />
+                  </button>
+                  {/* Price Table Button - Ao lado de Regras */}
+                  {item.name === 'Regras' && <PriceTableButton />}
+                </div>
               ))}
             </div>
 
@@ -714,9 +717,6 @@ export default function Home() {
               
               {/* Service Comparison Button */}
               <ServiceComparisonButton />
-              
-              {/* Price Table Button */}
-              <PriceTableButton />
               
               {/* WhatsApp */}
               <a
