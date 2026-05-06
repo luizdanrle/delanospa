@@ -1,5 +1,6 @@
 'use client'
 
+import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { MapPin, Heart, User, Sparkles, Calendar, Star, Scale } from 'lucide-react'
 import { cn } from '@/lib/utils'
@@ -8,6 +9,7 @@ import Image from 'next/image'
 import { FavoriteButton } from '@/components/FavoritesSystem'
 import { CompareButton } from '@/components/ComparePanel'
 import { BookingButtons } from '@/components/BookingButtons'
+import TherapistVideo from '@/components/TherapistVideo'
 
 interface TherapistCardProps {
   therapist: Therapist
@@ -17,6 +19,7 @@ interface TherapistCardProps {
 
 export default function TherapistCard({ therapist, index, onClick }: TherapistCardProps) {
   const hasImage = therapist.image_url && therapist.image_url.trim() !== ''
+  const [showVideo, setShowVideo] = useState(false)
   
   return (
     <motion.div
@@ -165,6 +168,18 @@ export default function TherapistCard({ therapist, index, onClick }: TherapistCa
               variant="vertical"
               className="w-full"
             />
+            
+            {/* Video Button */}
+            <button
+              onClick={(e) => {
+                e.stopPropagation()
+                setShowVideo(true)
+              }}
+              className="mt-2 flex items-center justify-center gap-2 w-full py-2.5 rounded-xl bg-gradient-to-r from-pink-600/20 to-rose-600/20 border border-pink-500/30 text-pink-300 hover:bg-pink-600/30 hover:text-white hover:border-pink-500/50 transition-all text-sm font-medium"
+            >
+              <Play className="w-4 h-4" />
+              Ver Vídeo Sensual
+            </button>
           </div>
           
           {/* View Details Hint */}
@@ -173,6 +188,13 @@ export default function TherapistCard({ therapist, index, onClick }: TherapistCa
           </p>
         </div>
       </div>
+
+      {/* Therapist Video Modal */}
+      <TherapistVideo 
+        therapist={therapist} 
+        isOpen={showVideo} 
+        onClose={() => setShowVideo(false)} 
+      />
     </motion.div>
   )
 }
