@@ -69,7 +69,6 @@ import PriceCalculator from '@/components/PriceCalculator'
 import LiveNotifications, { LiveNotificationsMobile } from '@/components/LiveNotifications'
 import InteractiveFAQ from '@/components/InteractiveFAQ'
 import RealTimeAvailability from '@/components/RealTimeAvailability'
-import ServiceComparison from '@/components/ServiceComparison'
 import SmartRecommendation from '@/components/SmartRecommendation'
 import BookingStats from '@/components/BookingStats'
 import HowItWorks from '@/components/HowItWorks'
@@ -95,9 +94,17 @@ import ParticleField from '@/components/ParticleField'
 import WarpBackground from '@/components/WarpBackground'
 
 // NOVOS COMPONENTES ÚTEIS - Funcionalidades premium
-import { useFavorites, FavoritesButton, FavoritesPanel, FavoriteButton } from '@/components/FavoritesSystem'
+import { useFavorites, FavoritesButton, FavoritesPanel, FavoriteButton, FavoritesButtonWithCount } from '@/components/FavoritesSystem'
 import QuickViewModal from '@/components/QuickViewModal'
-import { useCompare, CompareButton, ComparePanel } from '@/components/ComparePanel'
+import { useCompare, CompareButton, ComparePanel, CompareButtonWithCount } from '@/components/ComparePanel'
+
+// COMPONENTES DA BARRA SUPERIOR - Preços e Favoritos de Serviços
+import { ServiceFavoritesButton } from '@/components/ServiceFavoritesButton'
+import { PriceTableButton } from '@/components/PriceTableButton'
+
+// COMPONENTE DE COMPARAÇÃO DE SERVIÇOS
+import ServiceComparison from '@/components/ServiceComparison'
+import { ServiceComparisonButton } from '@/components/ServiceComparisonButton'
 
 // NOVOS COMPONENTES COMPLETOS - Dados reais
 import ServicesShowcase from '@/components/ServicesShowcase'
@@ -692,19 +699,24 @@ export default function Home() {
 
             {/* CTA Button */}
             <div className="hidden lg:flex items-center gap-3">
-              {/* Favorites Button */}
-              <FavoritesButton 
+              {/* Favorites Button - Massagistas */}
+              <FavoritesButtonWithCount 
                 onClick={() => setShowFavorites(true)} 
-                count={0} // Será atualizado pelo hook
               />
               
-              {/* Compare Button */}
-              <button
-                onClick={() => setShowCompare(true)}
-                className="relative p-3 rounded-full bg-slate-800 text-white hover:bg-slate-700 transition-colors"
-              >
-                <Scale className="w-5 h-5" />
-              </button>
+              {/* Compare Button - Massagistas */}
+              <CompareButtonWithCount 
+                onClick={() => setShowCompare(true)} 
+              />
+              
+              {/* Service Favorites Button */}
+              <ServiceFavoritesButton />
+              
+              {/* Service Comparison Button */}
+              <ServiceComparisonButton />
+              
+              {/* Price Table Button */}
+              <PriceTableButton />
               
               {/* WhatsApp */}
               <a
@@ -831,6 +843,9 @@ export default function Home() {
 
       {/* PRICING TABLE - Complete Price List */}
       <PricingTable />
+
+      {/* SERVICE COMPARISON - Compare different massages */}
+      <ServiceComparison />
 
       {/* Services Section - PREMIUM */}
       <section id="massagens" className="py-24 relative overflow-hidden">

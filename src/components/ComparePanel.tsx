@@ -281,3 +281,27 @@ export function ComparePanel({
     </>
   )
 }
+
+export function CompareButtonWithCount({ onClick }: { onClick: () => void }) {
+  const { count } = useCompare()
+  return (
+    <motion.button
+      onClick={onClick}
+      whileHover={{ scale: 1.05 }}
+      whileTap={{ scale: 0.95 }}
+      className="relative p-3 rounded-full bg-slate-800 text-white hover:bg-slate-700 transition-colors"
+      title="Comparar Massagistas"
+    >
+      <Scale className="w-5 h-5" />
+      {count > 0 && (
+        <motion.span
+          initial={{ scale: 0 }}
+          animate={{ scale: 1 }}
+          className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-amber-500 text-white text-xs flex items-center justify-center font-medium"
+        >
+          {count}
+        </motion.span>
+      )}
+    </motion.button>
+  )
+}

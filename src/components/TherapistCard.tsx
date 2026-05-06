@@ -1,10 +1,12 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { MapPin, Heart, User, Sparkles, Calendar, Star } from 'lucide-react'
+import { MapPin, Heart, User, Sparkles, Calendar, Star, Scale } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Therapist } from '@/lib/supabase'
 import Image from 'next/image'
+import { FavoriteButton } from '@/components/FavoritesSystem'
+import { CompareButton } from '@/components/ComparePanel'
 
 interface TherapistCardProps {
   therapist: Therapist
@@ -55,13 +57,49 @@ export default function TherapistCard({ therapist, index, onClick }: TherapistCa
           {/* Gradient Overlay */}
           <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/50 to-transparent" />
           
-          {/* VIP Badge */}
-          {therapist.experience_years && therapist.experience_years >= 5 && (
-            <div className="absolute top-4 right-4 px-3 py-1 rounded-full bg-gradient-to-r from-amber-500 to-yellow-500 text-white text-xs font-bold flex items-center gap-1">
-              <Star className="w-3 h-3" />
-              VIP
-            </div>
-          )}
+          {/* Action Buttons */}
+          <div className="absolute top-4 right-4 flex gap-2">
+            {/* VIP Badge */}
+            {therapist.experience_years && therapist.experience_years >= 5 && (
+              <div className="px-3 py-1 rounded-full bg-gradient-to-r from-amber-500 to-yellow-500 text-white text-xs font-bold flex items-center gap-1">
+                <Star className="w-3 h-3" />
+                VIP
+              </div>
+            )}
+            
+            {/* Favorite Button */}
+            <FavoriteButton 
+              item={{
+                id: therapist.id,
+                name: therapist.name,
+                image: therapist.image_url || undefined,
+                specialty: therapist.specialty || 'Massagista',
+                location: therapist.location || 'Local',
+                rating: 4.8
+              }}
+              className="bg-slate-900/80 backdrop-blur-sm border border-slate-700"
+            />
+            
+            {/* Compare Button */}
+            <CompareButton 
+              item={{
+                id: therapist.id,
+                name: therapist.name,
+                image: therapist.image_url || undefined,
+                specialty: therapist.specialty || 'Massagista',
+                location: therapist.location || 'Local',
+                rating: 4.8,
+                reviews: 150,
+                price: 120,
+                duration: 60,
+                experience: therapist.experience_years || 0,
+                services: therapist.services || [],
+                languages: ['Português'],
+                availability: 'Disponível'
+              }}
+              className="bg-slate-900/80 backdrop-blur-sm border border-slate-700"
+            />
+          </div>
           
           {/* Name Overlay */}
           <div className="absolute bottom-0 left-0 right-0 p-4">
