@@ -154,8 +154,7 @@ export default function TopicSidebar({ activeSection, onNavigate, onMinimizeChan
 
   const handleClick = (topicId: string) => {
     onNavigate(topicId)
-    setMobileOpen(false)
-    // Não minimizar automaticamente ao clicar, apenas em mobile
+    // Fechar sidebar apenas em mobile, manter aberto em desktop
     if (!isDesktop) {
       setMobileOpen(false)
     }
