@@ -305,3 +305,6 @@ export function CompareButtonWithCount({ onClick }: { onClick: () => void }) {
     </motion.button>
   )
 }
+
+// Exportar todos os componentes
+export { CompareButton, ComparePanel, CompareButtonWithCount }
