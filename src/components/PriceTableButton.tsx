@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { X, Euro, Clock, Sparkles, Star, Shield, ArrowRight } from 'lucide-react'
+import { BookingButtons } from '@/components/BookingButtons'
 import { cn } from '@/lib/utils'
 
 // Massage services data (same as in page.tsx)
@@ -251,15 +252,11 @@ export function PriceTableModal({
                       
                       <div className="text-right ml-4">
                         <div className="text-2xl font-bold text-white">€{service.price}</div>
-                        <a
-                          href="https://wa.me/351912345678?text=Olá! Quero agendar a massagem: ${service.name}"
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="mt-2 inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-gradient-to-r from-green-600 to-emerald-600 text-white text-sm font-medium hover:from-green-500 hover:to-emerald-500 transition-all"
-                        >
-                          Agendar
-                          <ArrowRight className="w-3 h-3" />
-                        </a>
+                        <BookingButtons 
+                          serviceName={service.name}
+                          size="sm"
+                          className="mt-2"
+                        />
                       </div>
                     </div>
                   </motion.div>

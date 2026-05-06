@@ -9,6 +9,7 @@ import {
 import { MASSAGE_SERVICES } from '@/data/siteData'
 import Image from 'next/image'
 import { cn } from '@/lib/utils'
+import { BookingButtons } from '@/components/BookingButtons'
 
 export default function ServicesShowcase() {
   const [selectedService, setSelectedService] = useState<typeof MASSAGE_SERVICES[0] | null>(null)
@@ -250,9 +251,12 @@ export default function ServicesShowcase() {
                           )}
                         </div>
                         
-                        <button className="w-full mt-6 py-3 rounded-xl bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold hover:from-purple-500 hover:to-pink-500 transition-all">
-                          Agendar Agora
-                        </button>
+                        <BookingButtons 
+                          serviceName={selectedService.name}
+                          size="md"
+                          variant="vertical"
+                          className="w-full mt-6"
+                        />
                       </div>
                     </div>
                   </div>

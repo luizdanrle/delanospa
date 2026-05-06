@@ -10,6 +10,7 @@ import {
   ArrowRight,
   HelpCircle
 } from 'lucide-react'
+import { BookingButtons } from '@/components/BookingButtons'
 import { cn } from '@/lib/utils'
 
 const services = [
@@ -342,16 +343,14 @@ export default function ServiceComparison() {
             <div className="grid grid-cols-4 gap-4 mt-4">
               <div className="p-4" />
               {selectedData.map((service) => (
-                <a
-                  key={service.id}
-                  href={`https://wa.me/351912345678?text=Olá! Tenho interesse na ${encodeURIComponent(service.name)}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="p-4 rounded-xl bg-gradient-to-r from-amber-600 to-orange-600 text-white font-medium text-center flex items-center justify-center gap-2 hover:shadow-lg hover:shadow-amber-500/25 transition-all"
-                >
-                  Agendar
-                  <ArrowRight className="w-4 h-4" />
-                </a>
+                <div key={service.id} className="p-4">
+                  <BookingButtons 
+                    serviceName={service.name}
+                    size="sm"
+                    variant="vertical"
+                    className="w-full"
+                  />
+                </div>
               ))}
             </div>
           </div>

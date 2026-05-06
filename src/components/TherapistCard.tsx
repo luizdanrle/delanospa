@@ -7,6 +7,7 @@ import { Therapist } from '@/lib/supabase'
 import Image from 'next/image'
 import { FavoriteButton } from '@/components/FavoritesSystem'
 import { CompareButton } from '@/components/ComparePanel'
+import { BookingButtons } from '@/components/BookingButtons'
 
 interface TherapistCardProps {
   therapist: Therapist
@@ -157,15 +158,14 @@ export default function TherapistCard({ therapist, index, onClick }: TherapistCa
           </div>
 
           {/* CTA */}
-          <a
-            href={`https://wa.me/351912345678?text=Olá! Gostaria de reservar com ${therapist.name}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="mt-5 flex items-center justify-center gap-2 w-full py-3 rounded-xl font-medium text-white bg-gradient-to-r from-pink-600 to-rose-600 hover:from-pink-500 hover:to-rose-500 transition-all opacity-90 hover:opacity-100"
-            onClick={(e) => e.stopPropagation()}
-          >
-            Reservar com {therapist.name}
-          </a>
+          <div className="mt-5" onClick={(e) => e.stopPropagation()}>
+            <BookingButtons 
+              therapistName={therapist.name}
+              size="md"
+              variant="vertical"
+              className="w-full"
+            />
+          </div>
           
           {/* View Details Hint */}
           <p className="text-center text-xs text-slate-500 mt-2">
