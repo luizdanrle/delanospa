@@ -48,11 +48,14 @@ import {
   Gift
 } from 'lucide-react'
 import { cn, formatCurrency, formatDuration } from '@/lib/utils'
+import ContentEditor from '@/components/admin/ContentEditor'
+import TherapistManager from '@/components/admin/TherapistManager'
+import ServiceManager from '@/components/admin/ServiceManager'
 
 export default function AdminDashboardPage() {
   const router = useRouter()
   const { user, signOut, loading: authLoading } = useAuth()
-  const [activeTab, setActiveTab] = useState<'services' | 'therapists' | 'locations' | 'contacts' | 'clients'>('services')
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'services' | 'therapists' | 'locations' | 'contacts' | 'clients' | 'content' | 'settings'>('dashboard')
   const [services, setServices] = useState<Service[]>([])
   const [therapists, setTherapists] = useState<Therapist[]>([])
   const [contactInfo, setContactInfo] = useState<ContactInfo | null>(null)
@@ -220,6 +223,18 @@ export default function AdminDashboardPage() {
             Principal
           </div>
           <button
+            onClick={() => setActiveTab('dashboard')}
+            className={cn(
+              "w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300",
+              activeTab === 'dashboard'
+                ? "bg-purple-500/20 text-purple-400 border border-purple-500/30"
+                : "text-slate-400 hover:bg-slate-800 hover:text-white"
+            )}
+          >
+            <LayoutDashboard className="w-5 h-5" />
+            <span>Dashboard</span>
+          </button>
+          <button
             onClick={() => setActiveTab('services')}
             className={cn(
               "w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300",
@@ -266,7 +281,23 @@ export default function AdminDashboardPage() {
           </button>
 
           <div className="px-4 py-2 mt-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">
-            Configurações
+            Conteúdo
+          </div>
+          <button
+            onClick={() => setActiveTab('content')}
+            className={cn(
+              "w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300",
+              activeTab === 'content'
+                ? "bg-purple-500/20 text-purple-400 border border-purple-500/30"
+                : "text-slate-400 hover:bg-slate-800 hover:text-white"
+            )}
+          >
+            <FileText className="w-5 h-5" />
+            <span>Editar Páginas</span>
+          </button>
+
+          <div className="px-4 py-2 mt-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">
+            Gestão
           </div>
           <button
             onClick={() => setActiveTab('locations')}
@@ -294,6 +325,22 @@ export default function AdminDashboardPage() {
           >
             <Phone className="w-5 h-5" />
             Contactos
+          </button>
+
+          <div className="px-4 py-2 mt-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">
+            Configurações
+          </div>
+          <button
+            onClick={() => setActiveTab('settings')}
+            className={cn(
+              "w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300",
+              activeTab === 'settings'
+                ? "bg-purple-500/20 text-purple-400 border border-purple-500/30"
+                : "text-slate-400 hover:bg-slate-800 hover:text-white"
+            )}
+          >
+            <Settings className="w-5 h-5" />
+            <span>Configurações</span>
           </button>
         </nav>
 
@@ -370,6 +417,153 @@ export default function AdminDashboardPage() {
         {/* Content */}
         <div className="p-8">
           <AnimatePresence mode="wait">
+            {activeTab === 'dashboard' && (
+              <motion.div
+                key="dashboard"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                className="space-y-6"
+              >
+                {/* Stats Cards */}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                  <div className="bg-slate-900 rounded-xl border border-slate-800 p-6">
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="p-3 bg-purple-500/20 rounded-lg">
+                        <Package className="w-6 h-6 text-purple-400" />
+                      </div>
+                      <TrendingUp className="w-5 h-5 text-green-400" />
+                    </div>
+                    <h3 className="text-2xl font-bold text-white">{stats.totalServices}</h3>
+                    <p className="text-slate-400 text-sm">Total de Serviços</p>
+                    <p className="text-green-400 text-xs mt-2">{stats.activeServices} ativos</p>
+                  </div>
+
+                  <div className="bg-slate-900 rounded-xl border border-slate-800 p-6">
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="p-3 bg-pink-500/20 rounded-lg">
+                        <UserCircle className="w-6 h-6 text-pink-400" />
+                      </div>
+                      <TrendingUp className="w-5 h-5 text-green-400" />
+                    </div>
+                    <h3 className="text-2xl font-bold text-white">{stats.totalTherapists}</h3>
+                    <p className="text-slate-400 text-sm">Massagistas</p>
+                    <p className="text-green-400 text-xs mt-2">Todos verificados</p>
+                  </div>
+
+                  <div className="bg-slate-900 rounded-xl border border-slate-800 p-6">
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="p-3 bg-blue-500/20 rounded-lg">
+                        <Users className="w-6 h-6 text-blue-400" />
+                      </div>
+                      <TrendingUp className="w-5 h-5 text-green-400" />
+                    </div>
+                    <h3 className="text-2xl font-bold text-white">{stats.totalClients}</h3>
+                    <p className="text-slate-400 text-sm">Clientes</p>
+                    <p className="text-green-400 text-xs mt-2">+12% este mês</p>
+                  </div>
+
+                  <div className="bg-slate-900 rounded-xl border border-slate-800 p-6">
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="p-3 bg-amber-500/20 rounded-lg">
+                        <MapPin className="w-6 h-6 text-amber-400" />
+                      </div>
+                      <TrendingUp className="w-5 h-5 text-green-400" />
+                    </div>
+                    <h3 className="text-2xl font-bold text-white">{stats.totalLocations}</h3>
+                    <p className="text-slate-400 text-sm">Localizações</p>
+                    <p className="text-green-400 text-xs mt-2">Todas ativas</p>
+                  </div>
+                </div>
+
+                {/* Quick Actions */}
+                <div className="bg-slate-900 rounded-xl border border-slate-800 p-6">
+                  <h3 className="text-lg font-semibold text-white mb-4">Ações Rápidas</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <button
+                      onClick={() => setActiveTab('content')}
+                      className="p-4 bg-slate-800 rounded-lg hover:bg-slate-700 transition-all text-left"
+                    >
+                      <FileText className="w-6 h-6 text-purple-400 mb-2" />
+                      <h4 className="font-semibold text-white">Editar Conteúdo</h4>
+                      <p className="text-slate-400 text-sm">Modifique textos e imagens do site</p>
+                    </button>
+                    <button
+                      onClick={() => setActiveTab('services')}
+                      className="p-4 bg-slate-800 rounded-lg hover:bg-slate-700 transition-all text-left"
+                    >
+                      <Package className="w-6 h-6 text-pink-400 mb-2" />
+                      <h4 className="font-semibold text-white">Gerenciar Serviços</h4>
+                      <p className="text-slate-400 text-sm">Adicione ou edite serviços</p>
+                    </button>
+                    <button
+                      onClick={() => setActiveTab('therapists')}
+                      className="p-4 bg-slate-800 rounded-lg hover:bg-slate-700 transition-all text-left"
+                    >
+                      <UserCircle className="w-6 h-6 text-blue-400 mb-2" />
+                      <h4 className="font-semibold text-white">Gerenciar Massagistas</h4>
+                      <p className="text-slate-400 text-sm">Gerencie o time de profissionais</p>
+                    </button>
+                  </div>
+                </div>
+
+                {/* Recent Activity */}
+                <div className="bg-slate-900 rounded-xl border border-slate-800 p-6">
+                  <h3 className="text-lg font-semibold text-white mb-4">Atividade Recente</h3>
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-3 p-3 bg-slate-800 rounded-lg">
+                      <div className="w-2 h-2 bg-green-400 rounded-full"></div>
+                      <span className="text-slate-300">Sistema online e funcionando</span>
+                      <span className="text-slate-500 text-sm ml-auto">Agora</span>
+                    </div>
+                    <div className="flex items-center gap-3 p-3 bg-slate-800 rounded-lg">
+                      <div className="w-2 h-2 bg-blue-400 rounded-full"></div>
+                      <span className="text-slate-300">Novos favoritos compartilhados</span>
+                      <span className="text-slate-500 text-sm ml-auto">Há 5 min</span>
+                    </div>
+                    <div className="flex items-center gap-3 p-3 bg-slate-800 rounded-lg">
+                      <div className="w-2 h-2 bg-purple-400 rounded-full"></div>
+                      <span className="text-slate-300">Backup automático concluído</span>
+                      <span className="text-slate-500 text-sm ml-auto">Há 1 hora</span>
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+            )}
+
+            {activeTab === 'content' && (
+              <motion.div
+                key="content"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+              >
+                <ContentEditor page="home" section="main" />
+              </motion.div>
+            )}
+
+            {activeTab === 'services' && (
+              <motion.div
+                key="services"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+              >
+                <ServiceManager onServiceUpdate={setServices} />
+              </motion.div>
+            )}
+
+            {activeTab === 'therapists' && (
+              <motion.div
+                key="therapists"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+              >
+                <TherapistManager onTherapistUpdate={setTherapists} />
+              </motion.div>
+            )}
+
             {activeTab === 'services' && (
               <motion.div
                 key="services"
